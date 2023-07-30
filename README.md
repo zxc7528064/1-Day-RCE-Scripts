@@ -1,3 +1,3 @@
 # RCE 批量
-- Drupal RCE
+- Drupal7 RCE
 - 待繼續 
