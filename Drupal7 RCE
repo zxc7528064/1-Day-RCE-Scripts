@@ -27,7 +27,7 @@ def poc(target):
     except:
         pass
 try:
-    with open('/home/kali/Desktop/PoC/CVE-2018-7600-Drupal7/target2.txt') as file:
+    with open('/home/kali/Desktop/PoC/CVE-2018-7600-Drupal7/target.txt') as file: # target.txt 路徑
         url_list = file.readlines()
         for url in url_list:
            target_url = url.strip()
