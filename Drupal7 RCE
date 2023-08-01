@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # _*_ coding:utf-8 _*_
 # Author : Noth
-# Timne : 2023-7-30
+# Time : 2023-7-30
 
 import re
 import requests
@@ -41,7 +41,7 @@ session.mount('http://', adapter)
 
 try:
     sucess_list = []
-    with open('/home/kali/Desktop/PoC/CVE-2018-7600-Drupal7/target.txt') as file:
+    with open('/home/kali/Desktop/PoC/CVE-2018-7600-Drupal7-RCE/target.txt') as file:
         url_list = file.readlines()
         for url in url_list:
            target_url = url.strip()
@@ -57,10 +57,10 @@ except IOError:
     success_list = manager.list()
 
     # 使用 multiprocessing.Pool 來並行處理URL列表
-    with Pool(processes=4) as pool:  # 調整進程速量
+    with Pool(processes=4) as pool:  # 調整進程數量
         pool.map(poc, url_list)
 
 if sucess_list:
-    with open('/home/kali/Desktop/PoC/CVE-2018-7600-Drupal7/sucess.txt','w') as f:
+    with open('/home/kali/Desktop/PoC/CVE-2018-7600-Drupal7-RCE/sucess.txt','w') as f:
         for result in sucess_list:
             f.write(result + '\n')
