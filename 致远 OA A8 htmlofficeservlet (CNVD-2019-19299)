@@ -3,6 +3,8 @@
 # Author : Noth
 # Time : 2023-8-1
 
+# fofa : title="致远A8-V5协同管理软件 V6.1sp1"
+
 import os
 import sys
 import re
