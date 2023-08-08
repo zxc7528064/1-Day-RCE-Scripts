@@ -1,0 +1,45 @@
+#!/usr/bin/env python3
+# _*_ coding:utf-8 _*_
+# Author : Noth
+# Time : 
+# fofa : app="泛微-EOffice"
+# 泛微OA E-Office OfficeServer.php 任意文件上傳
+
+import os
+import sys
+import re
+from tqdm import tqdm
+import requests
+from bs4 import BeautifulSoup
+
+# 存放狀態碼 200 url
+
+url_200 = []
+
+# 判斷 url 狀態碼是否 200 
+
+try:
+    with open('C:\\Users\\user\\Desktop\\RedTeam\\X-Fofa\\泛微-EOffice.txt','r') as file:
+        # Get the total number of lines in the file for tqdm
+        total_lines = sum(1 for line in file)
+        # Return to the beginning of the file
+        file.seek(0)
+        for url in tqdm(file, total=total_lines, desc="Checking URLs"):
+            url = url.strip()
+            try:
+                r = requests.get(url,timeout=4)
+                r.raise_for_status()
+                # print (f'{url} 正常連線')
+                url_200.append(url)
+            except requests.exceptions.RequestException as err:
+                # print(f'{url} 無法連線或逾時') 
+                pass 
+except FileNotFoundError:
+    print("目標 泛微-EOffice.txt 找不到")
+except Exception as e:
+    print(e)
+
+if url_200:
+    with open('C:\\Users\\user\\Desktop\\RedTeam\\X-Fofa\\sucess.txt','w') as f:
+        for result in url_200:
+            f.write(result + '\n')
