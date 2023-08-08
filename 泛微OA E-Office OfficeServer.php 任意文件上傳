@@ -3,7 +3,7 @@
 # Author : Noth
 # Time : 
 # fofa : app="泛微-EOffice"
-# 泛微OA E-Office OfficeServer.php 任意文件上傳
+# 泛微 OA E-Office OfficeServer.php 任意文件上傳
 
 import os
 import sys
