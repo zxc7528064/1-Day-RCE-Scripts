@@ -47,7 +47,7 @@ try:
             url = url.strip()
             check_url(url)
 except FileNotFoundError:
-    print("目標 泛微-EOffice.txt 找不到")
+    print("目標 target.txt 找不到")
 except Exception as e:
     print(e)
 
