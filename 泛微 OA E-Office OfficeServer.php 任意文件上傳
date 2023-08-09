@@ -2,7 +2,7 @@
 # _*_ coding:utf-8 _*_
 # Author : Noth
 # Time : 2023-8-9
-# fofa : app="泛微-EOffice"
+# fofa : app="泛微-EOffice" && country="CN"
 
 import os
 import sys
