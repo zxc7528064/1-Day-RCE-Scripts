@@ -11,6 +11,27 @@ import re
 from tqdm import tqdm
 import requests
 from bs4 import BeautifulSoup
+from threading import *
+import threading
+
+# 定義並發線程數
+
+MAX_THREADS = 64
+
+# 創建信號量來限制並發線程數
+
+pool = threading.Semaphore(64)
+
+# 檢查 URL 的函數
+
+def check_url(url):
+    try:
+        response = requests.get(url, timeout=4)
+        response.raise_for_status() # 顯示出錯誤資訊
+        with pool:
+            url_200.append(url)
+    except requests.exceptions.RequestException as err:
+        pass
 
 # 存放狀態碼 200 url
 
@@ -20,20 +41,11 @@ url_200 = []
 
 try:
     with open('C:\\Users\\user\\Desktop\\RedTeam\\X-Fofa\\泛微-EOffice.txt','r') as file:
-        # Get the total number of lines in the file for tqdm
-        total_lines = sum(1 for line in file)
-        # Return to the beginning of the file
+        total_lines = sum(1 for line in file) # 進度條
         file.seek(0)
         for url in tqdm(file, total=total_lines, desc="Checking URLs"):
             url = url.strip()
-            try:
-                r = requests.get(url,timeout=4)
-                r.raise_for_status()
-                # print (f'{url} 正常連線')
-                url_200.append(url)
-            except requests.exceptions.RequestException as err:
-                # print(f'{url} 無法連線或逾時') 
-                pass 
+            check_url(url)
 except FileNotFoundError:
     print("目標 泛微-EOffice.txt 找不到")
 except Exception as e:
