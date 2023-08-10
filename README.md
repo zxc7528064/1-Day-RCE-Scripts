@@ -11,6 +11,11 @@ Use: Python3 AutoScript.py
 ```
 - 泛微 OA E-Office OfficeServer.php 任意文件上傳
 ```
-給予目標 IP target.txt (包含 http/https)，先判斷 URL 狀態碼是否為 200，並自動上傳 Webshell，成功後寫入到 sucess.txt 中。
+給予目標 IP target.txt (包含 http/https)，並自動上傳 Webshell，成功後寫入到 sucess.txt 中。
+Use: Python3 AutoScript.py
+```
+- 通達OA v2017 action_upload.php 任意文件上傳漏洞
+```
+給予目標 IP target.txt (包含 http/https)，並自動上傳 Webshell，成功後寫入到 sucess.txt 中。
 Use: Python3 AutoScript.py
 ```
