@@ -17,5 +17,6 @@ Use: Python3 AutoScript.py
 - 通達OA v2017 action_upload.php 任意文件上傳漏洞
 ```
 給予目標 IP target.txt (包含 http/https)，並自動上傳 Webshell，成功後寫入到 sucess.txt 中。
+蟻劍密碼 : cmd(base64)
 Use: Python3 AutoScript.py
 ```
