@@ -40,7 +40,7 @@ url_200 = []
 # 判斷 url 狀態碼是否 200 
 
 try:
-    with open('C:\\Users\\user\\Desktop\\RedTeam\\X-Fofa\\3600.txt','r') as file:
+    with open('C:\\Users\\user\\Desktop\\RedTeam\\X-Fofa\\result.txt','r') as file:
         total_lines = sum(1 for line in file) # 進度條
         file.seek(0)
         for url in tqdm(file, total=total_lines, desc="Checking URLs"):
@@ -51,7 +51,7 @@ except FileNotFoundError:
 except Exception as e:
     print(e)
 
-# 將 url 狀態碼 200 存成 泛微_sucess_200.txt
+# 將 url 狀態碼 200 存成 3600_sucess_200.txt
 
 if url_200:
     with open('C:\\Users\\user\\Desktop\\RedTeam\\X-Fofa\\3600_sucess_200.txt','w') as f:
