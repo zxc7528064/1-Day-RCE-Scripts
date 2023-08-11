@@ -2,7 +2,7 @@
 # _*_ coding:utf-8 _*_
 # Author : Noth
 # Time : 2023-8-10
-# fofa : title="网神SecGate" && country="CN"
+# fofa : app="万户网络-ezOFFICE" && country="CN"
 
 import os
 import sys
