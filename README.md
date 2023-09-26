@@ -22,7 +22,14 @@ Use: Python3 AutoScript.py
 ```
 - 萬戶OA OfficeServer.jsp 任意文件上傳漏洞
 ```
-給予目標 IP target.txt (包含 http/https)，自動判斷URL狀態是否為200，並上傳 Webshell，成功後寫入到 upload_ezOFFICE.txt_200.txt 中。
+給予目標 IP target.txt (包含 http/https)，自動判斷 URL 狀態是否為 200，並上傳 Webshell，成功後寫入到 upload_ezOFFICE.txt_200.txt 中。
 冰蠍 : rebeyond
 Use: Python3 AutoScript.py
+```
+- 泛微 OA E-Office(CNVD-2021-49104) 任意檔案上傳
+```
+給予目標 IP target.txt (包含 http/https) , 自動上傳 Webshell , 將成功上傳寫入到 sucess.txt
+Use : python3 FanWeiOffice.py --upload-pl EOffice-url.txt (批量掃描)
+Ex:
+Webshell 位置 : http://27.152.156.245:8082/images/logo/logo-eoffice.php
 ```
