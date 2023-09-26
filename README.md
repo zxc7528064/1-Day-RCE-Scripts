@@ -28,8 +28,6 @@ Use: Python3 AutoScript.py
 ```
 - 泛微 OA E-Office(CNVD-2021-49104) 任意檔案上傳
 ```
-給予目標 IP target.txt (包含 http/https) , 自動上傳 Webshell , 將成功上傳寫入到 sucess.txt
-Use : python3 FanWeiOffice.py --upload-pl EOffice-url.txt (批量掃描)
-Ex:
-Webshell 位置 : http://27.152.156.245:8082/images/logo/logo-eoffice.php
+給予目標 IP target.txt (包含 http/https) , 自動上傳 Webshell , 將成功上傳 Webshell 地址寫入到 success.txt
+Use : python3 AutoScript.py --upload-pl EOffice-url.txt (批量掃描)
 ```
