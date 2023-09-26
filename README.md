@@ -26,7 +26,7 @@ Use: Python3 AutoScript.py
 冰蠍 : rebeyond
 Use: Python3 AutoScript.py
 ```
-- 泛微 OA E-Office(CNVD-2021-49104) 任意檔案上傳
+- 泛微 OA E-Office (CNVD-2021-49104) 任意檔案上傳
 ```
 給予目標 IP target.txt (包含 http/https) , 自動上傳 Webshell , 將成功上傳 Webshell 地址寫入到 success.txt
 Use : python3 AutoScript.py --upload-pl EOffice-url.txt (批量掃描)
