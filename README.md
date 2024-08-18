@@ -1,4 +1,4 @@
-# RCE 批量腳本
+# 1 Day EXploit RCE 批量腳本
 - Drupal7
 ```
 給予目標 IP target.txt (包含 http/https)，成功後會寫入到 sucess.txt 中。
