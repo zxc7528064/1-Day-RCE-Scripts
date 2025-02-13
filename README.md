@@ -31,3 +31,8 @@ Use: Python3 AutoScript.py
 給予目標 IP target.txt (包含 http/https) , 自動上傳 Webshell , 將成功上傳 Webshell 地址寫入到 success.txt
 Use : python3 AutoScript.py --upload-pl EOffice-url.txt (批量掃描)
 ```
+- 九逆贏商業管理系統Common.ashx存在檔案上傳漏洞
+```
+給予目標 IP target.txt (包含 http/https) , 自動上傳 Webshell , 將成功上傳 Webshell 地址寫入到 result-sucess5_200.txt
+Use : python3 AutoScript.py (批量掃描)
+```
